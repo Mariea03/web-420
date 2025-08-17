@@ -1,2 +1,5 @@
 # web-420
-These projects were created as part of coursework to practice building RESTful APIs with Node.js and Express, following along with the pragmatic RESTful APIs textbook.
+<h1>WEB 420 RESTful APIs</h1>
+<h2>Contributers</h2>
+*Richard Krasso
+*Mariea Nies
