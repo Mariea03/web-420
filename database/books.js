@@ -1,10 +1,8 @@
-const books = [
-    {id: 1, title: "The Great Gatsby", author: "F. Scott Fitzgerald"},
-    {id: 2, title: "1984", author: "George Orwell"},
-    {id: 3, title: "To Kill a Mockingbird", author: "Harper Lee"},
-];
+const collection = require('./collection');
 
 module.exports = {
-    find:() => books,
-    findOne: (id) => books.find(book => book.id === id)
+    addBook: (book) => collection.add(book),
+    deleteBook: (id) => collection.remove(id),
+    getBooks: () => collection.getAll(),
+    resetBooks: () => collection.reset()
 };

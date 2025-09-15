@@ -1,32 +1,38 @@
-const request = require("supertest");
-const express = require("express");
-const app = require("../src/app");
+const request = require('supertest');
+const app = require('../src/app');
+const books = require('../database/books')
 
-describe("Chapter [Number]: API Tests", () => {
-    // Test GET /api/books
-    test("Should return an array of books", async () => {
-        const res = await request(app).get("/api/books");
-        expect(res.statusCode).toBe(200);
-        expect(res.body).toBeInstanceOf(Array);
-        expect(res.body.length).toBeGreaterThan(0);
-        expect(res.body[0]).toHaveProperty("id");
-        expect(res.body[0]).toHaveProperty("title");
-        expect(res.body[0]).toHaveProperty("author");
+describe("In-N-Out-Books: API Tests", () => {
+    beforeEach(() => {
+        books.resetBooks();
     });
 
-    // Test Get /api/books/:id
-    test("Should return a single book", async () =>{
-        const res = await request(app).get("/api/books/1");
-        expect(res.statusCode).toBe(200);
-        expect(res.body).toHaveProperty("id",1);
-        expect(res.body).toHaveProperty("title");
-        expect(res.body).toHaveProperty("author");
+    test("Should return a 201-status code when adding a new book", async () => {
+        const response = await request(app)
+          .post('/api/books')
+          .send({id: "1", title: "Test Book", author: "Author A"});
+
+        expect(response.status).toBe(201);
+        expect(response.body).toEqual(
+            expect.objectContaining({id: "1", title: "Test Book", author: "Author A"})
+        );
     });
 
-    // Test 400 error if id is not a number
-    test("Should return a 400 error if the id is not a number", async () => {
-        const res = await request(app).get("/api/books/abc");
-        expect(res.statusCode).toBe(400);
-        expect(res.body).toHaveProperty("error");
+    test("Should return a 400-status code when adding a new book with missing title", async () => {
+        const response = await request(app)
+          .post('/api/books')
+          .send({ id: "2", author: "Author B"});
+        
+        expect(response.status).toBe(400);
+        expect(response.body.message).toBe("Book title is required");
+    });
+
+    test("Should return a 204-status code when deleting a book", async () => {
+        books.addBook({ id: "3", title: "Delete Me", author: "Author C"});
+
+        const response = await request(app)
+          .delete('/api/books/3');
+
+        expect(response.status).toBe(204);
     });
 });
