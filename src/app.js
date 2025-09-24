@@ -3,44 +3,58 @@
 // File: app.js
 // Description: Express app serving IN-N-Out-Books landing page
 
-const express = require('express');
-const books = require('../database/books');
-
+const express = require("express");
 const app = express();
+const { getAllBooks, addBook, updateBook } = require("../database/books");
+
 app.use(express.json());
 
-app.post('/api/books', (req, res) =>{
-    try{
-        const {id, title, author} = req.body;
+// Get all books
+app.get("/api/books", (req, res) => {
+    res.json(getAllBooks());
+});
 
+// POST a new book
+app.post("/api/books", (req,res) => {
+    try {
+        const { title, author } = req.body;
         if (!title) {
-            return res.status(400).json({ message: "Book title is required"});
+            return res.status(400).json({ error: "Bad Request"});
         }
-
-        const newBook = { id, title, author};
-        books.addBook(newBook);
-
-        res.status(201).json(newBook);
-    } catch (err) {
-        res.status(500).json({ message: "Server error"});
+        const newBook = addBook({ title, author});
+        return res.status(201).json(newBook);
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
     }
 });
 
-
-app.delete('/api/books/:id', (req, res) => {
+// PUT update an existing book
+app.put("/api/books/:id", (req, res) => {
     try {
         const id = req.params.id;
-        const success = books.deleteBook(id);
 
-        if (success) {
-            return res.status(204).send();
-        } else {
-            return res.status(404).json({ message: "Book not found" });
+        if (isNaN(id)) {
+            return res.status(400).json({ error: "Input must be a number" });
         }
-    } catch (err) {
-        res.status(500).json({ message: "Server error" });
-    }
+
+        const { title, author } = req.body;
+
+        if (!title) {
+            return res.status(400).json ({error: "Bad Request"});
+        }
+
+        // Update the book
+        const updated = updateBook(Number(id), { title, author});
+
+        if (!updated) {
+            return res.status(404).json({ error: "Book not found"});
+        }
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).json({ error:message });
+    }        
 });
+
 
 module.exports = app;
 

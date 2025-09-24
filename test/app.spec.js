@@ -1,38 +1,64 @@
 const request = require('supertest');
 const app = require('../src/app');
-const books = require('../database/books')
+const { books } = require("../database/books");
+
+beforeEach(() => {
+  books.length = 0;
+  books.push(
+    { id: 1, title: "Book One", author: "Author One" },
+    { id: 2, title: "Book Two", author: "Author Two" }
+  );
+});
+
 
 describe("In-N-Out-Books: API Tests", () => {
-    beforeEach(() => {
-        books.resetBooks();
-    });
+  // GET books test
+  test("Should return all books", async ()=> {
+    const response = await request(app).get("/api/books");
+    expect(response.status).toEqual(200);
+    expect(Array.isArray(response.body)).toBe(true);
+  });
 
-    test("Should return a 201-status code when adding a new book", async () => {
-        const response = await request(app)
-          .post('/api/books')
-          .send({id: "1", title: "Test Book", author: "Author A"});
+// POST book test
+test("Should create a new book and return 201", async () => {
+  const response = await request(app)
+   .post("/api/books")
+   .send({ title: "New Book", author: "New Author" });
+  expect(response.status).toEqual(201);
+  expect(response.body.title).toBe("New Book");
+ });
 
-        expect(response.status).toBe(201);
-        expect(response.body).toEqual(
-            expect.objectContaining({id: "1", title: "Test Book", author: "Author A"})
-        );
-    });
+test("Should return 400 when creating a book without a title", async () => {
+  const response = await request(app)
+   .post("/api/books")
+   .send({ author: "Missing Title" });
+  expect(response.status).toEqual(400);
+  expect(response.body.error).toBe("Bad Request");
+ });
 
-    test("Should return a 400-status code when adding a new book with missing title", async () => {
-        const response = await request(app)
-          .post('/api/books')
-          .send({ id: "2", author: "Author B"});
-        
-        expect(response.status).toBe(400);
-        expect(response.body.message).toBe("Book title is required");
-    });
+// PUT book tests
+test("Should update a book and return 204", async () => {
+  const response = await request(app)
+   .put("/api/books/1")
+   .send({ title: "Updated Title", author: "Updated Author" });
+  expect(response.status).toEqual(204);
+ });
 
-    test("Should return a 204-status code when deleting a book", async () => {
-        books.addBook({ id: "3", title: "Delete Me", author: "Author C"});
+test("Should return 400 when using non-numeric id", async () => {
+  const response = await request (app)
+   .put("/api/books/foo")
+   .send({ title: "Some Title", author: "Some Author" });
+  expect(response.status).toEqual(400);
+  expect(response.body.error).toBe("Input must be a number");
+ });
 
-        const response = await request(app)
-          .delete('/api/books/3');
 
-        expect(response.status).toBe(204);
-    });
+test("Should return 400 when updating a book without a title", async () => {
+  const response = await request(app)
+   .put("/api/books/1")
+   .send({ author: "Missing Title" });
+  expect(response.status).toEqual(400);
+  expect(response.body.error).toBe("Bad Request");
+ });
+ 
 });
