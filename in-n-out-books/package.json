@@ -1,0 +1,32 @@
+{
+  "name": "in-n-out-books",
+  "version": "1.0.0",
+  "description": "<h1>WEB 420 RESTful APIs</h1>\r <h2>Contributers</h2>\r *Richard Krasso\r *Mariea Nies",
+  "main": "src/app.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "start": "node src/app.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mariea03/web-420.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mariea03/web-420/issues"
+  },
+  "homepage": "https://github.com/Mariea03/web-420#readme",
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "jest": "^30.1.3",
+    "supertest": "^7.1.4"
+  }
+}
