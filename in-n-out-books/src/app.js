@@ -6,6 +6,7 @@
 const express = require("express");
 const Ajv = require("ajv");
 const { getAllBooks, addBook, updateBook } = require("../database/books");
+const bcrypt = require("bcryptjs");
 const { getUserByEmail } = require("../database/users");
 
 const app = express();
@@ -57,6 +58,34 @@ app.put("/api/books/:id", (req, res) => {
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }        
+});
+
+// Adding wk 6
+app.post("/api/login", (req, res)=> {
+    try{
+        const { email, password } = req.body;
+
+    // Check if email and password are provided
+    if (!email || !password){
+        return res.status(400).json({ error: "Bad Request" });
+    } 
+    
+    const user = getUserByEmail(email);
+    if (!user) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+    
+    // Compare password with stored hash
+    const validPassword = bcrypt.compareSync(password, user.password);
+
+    if (!validPassword) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    return res.status(200).json({ message: "Authentication successful" });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
 });
 
 // Adding wk 7

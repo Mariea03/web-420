@@ -81,7 +81,7 @@ test("Should return 400 when updating a book without a title", async () => {
     expect(response.body.error).toBe("Bad Request"); 
   });
 
-  test("It should return 401 with Unauthorized when ansers are incorrect", async () => {
+  test("It should return 401 with Unauthorized when answers are incorrect", async () => {
     const response = await request(app)
      .post("/api/users/test@example.com/verify-security-question")
      .send([{ answer: "wrong" }, {answer: "wrong" }]);
@@ -90,5 +90,35 @@ test("Should return 400 when updating a book without a title", async () => {
     expect(response.body.error).toBe("Unauthorized"); 
   });
  });
- 
+
+ describe("Chapter 5: API Tests", () => {
+  test("It should log a user in and return 200 with success message", async () => {
+    const response = await request(app)
+     .post("/api/login")
+     .send({ email: "test@example.com", password: "password123" });
+
+
+    expect(response.status).toEqual(200);
+    expect(response.body.message).toBe("Authentication successful");
+  });
+
+  test("It should return 401 with Unauthorized when credentials are wrong", async () =>{
+    const response = await request(app)
+     .post("/api/login")
+     .send({ email: "test@expample.com", password: "wrongpass" });
+
+    expect(response.status).toEqual(401);
+    expect(response.body.error).toBe("Unauthorized");
+  });
+
+  test("It should return 400 with Bad Request when email or password is missing",async () =>{
+    const response = await request(app)
+      .post("/api/login")
+      .send({ email: "test@example.com" });  //password missing
+
+    expect(response.status).toEqual(400);
+    expect(response.body.error).toBe("Bad Request");  
+  });
+
+ });
 });

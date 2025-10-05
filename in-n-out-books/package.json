@@ -23,6 +23,7 @@
   "homepage": "https://github.com/Mariea03/web-420#readme",
   "dependencies": {
     "ajv": "^8.17.1",
+    "bcryptjs": "^3.0.2",
     "express": "^4.18.2"
   },
   "devDependencies": {
